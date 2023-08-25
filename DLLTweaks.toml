@@ -1,0 +1,5 @@
+# DLLTweaks
+
+[Patches]
+AbsorbChance = true				#	DESCRIPTION
+PlayerScaleMovement = true		#	DESCRIPTION

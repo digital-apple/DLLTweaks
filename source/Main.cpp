@@ -1,4 +1,5 @@
 #include "Hooks.h"
+#include "Settings.h"
 
 void InitLogging()
 {
@@ -41,6 +42,12 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
 	logs::info("{} v{} is loading...", plugin->GetName(), plugin->GetVersion());
+
+	if (Settings::load_config("Data/SKSE/Plugins/DLLTweaks.toml"s)) {
+		logs::info("Loading configuration file.");
+	} else {
+		logs::info("Couldn't load configuration file!");
+	}
 
 	SKSE::Init(a_skse);
 	InitMessaging();

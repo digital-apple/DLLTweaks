@@ -11,7 +11,7 @@ namespace Addresses
 		return static_cast<std::uint32_t>(currentValue > fPlayerMaxResistance ? fPlayerMaxResistance : currentValue);
 	}
 
-	struct RacialScaleSpeedPatch
+	struct PlayerScaleMovementPatch
 	{
 		static float thunk(RE::TESObjectREFR* a_reference)
 		{
@@ -43,7 +43,7 @@ namespace Addresses
 		if (*Settings::PlayerScaleMovementPatch) {
 			REL::Relocation<std::uintptr_t> function{ RELOCATION_ID(37013, 38041), REL::Relocate(0x1A, 0x1F) };
 			
-			stl::write_thunk_call<RacialScaleSpeedPatch>(function.address());
+			stl::write_thunk_call<PlayerScaleMovementPatch>(function.address());
 
 			logs::info("Addresses :: Patched 'PlayerScaleMovement'.");
 		}

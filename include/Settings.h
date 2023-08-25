@@ -6,12 +6,6 @@ public:
     using bSetting = AutoTOML::bSetting;
     using fSetting = AutoTOML::fSetting;
 
-    [[nodiscard]] static Settings* GetSingleton()
-    {
-        static Settings singleton;
-        return std::addressof(singleton);
-    }
-
     static inline bSetting AbsorbChancePatch{ "Patches", "AbsorbChance", true };
     static inline bSetting PlayerScaleMovementPatch{ "Patches", "PlayerScaleMovement", true };
 
@@ -43,12 +37,5 @@ public:
 private:
     using ISetting = AutoTOML::ISetting;
 
-    Settings();
-    Settings(const Settings&) = delete;
-    Settings(Settings&&) = delete;
-
-    ~Settings() = default;
-
-    Settings& operator=(const Settings&) = delete;
-    Settings& operator=(Settings&&) = delete;    
+    Settings();   
 };

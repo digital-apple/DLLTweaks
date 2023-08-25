@@ -1,5 +1,5 @@
 # DLLTweaks
 
 [Patches]
-AbsorbChance = true           # DESCRIPTION
-PlayerScaleMovement = true    # DESCRIPTION
+AbsorbChance = true           # Spell absorption cap will no longer exceed fPlayerMaxResistance.
+PlayerScaleMovement = true    # Player movement speed now does not scale with race height.

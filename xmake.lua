@@ -22,7 +22,7 @@ set_config("skyrim_vr", false)
 target("FTweaks")
     add_deps("commonlibsse-ng")
 	
-	add_packages("simpleini")
+    add_packages("simpleini")
 
     add_rules("commonlibsse-ng.plugin", {
         name = "FTweaks",

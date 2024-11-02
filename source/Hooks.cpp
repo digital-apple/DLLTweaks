@@ -1,51 +1,78 @@
 #include "Hooks.h"
 #include "Settings.h"
 
-namespace Addresses
+namespace Fixes
 {
-	auto CheckAbsorbPatch(RE::ActorValueOwner* a_actor, RE::ActorValue a_value) -> std::uint32_t 
-	{
-		auto currentValue = a_actor->GetActorValue(a_value);
-		auto fPlayerMaxResistance = RE::GameSettingCollection::GetSingleton()->GetSetting("fPlayerMaxResistance")->GetFloat();
+    // Starting the game as a Nord no longer breaks intended mechanics.
 
-		return static_cast<std::uint32_t>(currentValue > fPlayerMaxResistance ? fPlayerMaxResistance : currentValue);
-	}
+    void NordRaceStats::Install()
+    {
+        if (Settings::NordRaceStats) {
+            const auto player = RE::PlayerCharacter::GetSingleton();
 
-	struct PlayerScaleMovementPatch
-	{
-		static float thunk(RE::TESObjectREFR* a_reference)
-		{
-			auto scale = func(a_reference);
-			
-			if (a_reference->As<RE::Actor>() == RE::PlayerCharacter::GetSingleton()) {
-				return a_reference->GetReferenceRuntimeData().refScale / 100.0F;
-			}
-			return scale;
-		}
-		static inline REL::Relocation<decltype(thunk)> func;
-	};
+            if (!player) { return; }
 
-	void Hook()
-	{
-		if (*Settings::AbsorbChancePatch) {
-			REL::Relocation<std::uintptr_t> function{ RELOCATION_ID(37792, 38741), REL::Relocate(0x53, 0x55) };
+            player->InitValues();
 
-			auto& trampoline = SKSE::GetTrampoline();
-			SKSE::AllocTrampoline(14);
-			trampoline.write_call<5>(function.address(), CheckAbsorbPatch);
+            INFO("Fixes @ Installed <{}>", typeid(NordRaceStats).name());
+        }
+    }
 
-			std::uint8_t NOP[] = { 0x90, 0x90, 0x90 };
-			REL::safe_write(function.address() + 0x5, NOP, 3);
+    // The player's racial scale no longer grants different movement speed.
 
-			logs::info("Addresses :: Patched 'AbsorbChance'.");
-		}
+    struct ScaleMovementSpeed
+    {
+        static float Call(RE::TESObjectREFR* a_reference)
+        {
+            const auto scale = Callback(a_reference);
 
-		if (*Settings::PlayerScaleMovementPatch) {
-			REL::Relocation<std::uintptr_t> function{ RELOCATION_ID(37013, 38041), REL::Relocate(0x1A, 0x1F) };
-			
-			stl::write_thunk_call<PlayerScaleMovementPatch>(function.address());
+            if (a_reference->As<RE::Actor>() == RE::PlayerCharacter::GetSingleton()) {
+                return a_reference->GetReferenceRuntimeData().refScale / 100.f;
+            }
 
-			logs::info("Addresses :: Patched 'PlayerScaleMovement'.");
-		}
-	}
+            return scale;
+        }
+        static inline REL::Relocation<decltype(Call)> Callback;
+    };
+
+    void Install()
+    {
+        if (Settings::ScaleMovementSpeed) {
+            REL::Relocation target{ RELOCATION_ID(37013, 38041), REL::Relocate(0x1A, 0x1F) };
+            stl::write_thunk_call<ScaleMovementSpeed>(target.address());
+
+            INFO("Fixes @ Installed <{}>", typeid(ScaleMovementSpeed).name());
+        }
+    }
+}
+
+namespace Tweaks
+{
+    // Caps the maximum spell absorption chance to the fPlayerMaxResistance game setting value; 
+
+    struct AbsorptionChance
+    {
+        static auto Call(RE::ActorValueOwner* a_actor, RE::ActorValue a_value) -> std::uint32_t
+        {
+            const auto currentChance = a_actor->GetActorValue(a_value);
+            const auto fPlayerMaxResistance = RE::GameSettingCollection::GetSingleton()->GetSetting("fPlayerMaxResistance")->GetFloat();
+
+            return static_cast<std::uint32_t>(currentChance > fPlayerMaxResistance ? fPlayerMaxResistance : currentChance);
+        }
+    };
+
+    void Install()
+    {
+        if (Settings::AbsorptionChance) {
+            REL::Relocation target{ RELOCATION_ID(37792, 38741), REL::Relocate(0x53, 0x55) };
+            stl::write_call<AbsorptionChance>(target.address());
+
+            // Clean up garbage instructions.
+
+            std::uint8_t NOP[] = { 0x90, 0x90, 0x90 };
+            REL::safe_write(target.address() + 0x5, NOP, 3);
+
+            INFO("Tweaks @ Installed <{}>", typeid(AbsorptionChance).name());
+        }
+    }
 }

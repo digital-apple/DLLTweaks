@@ -1,41 +1,15 @@
 #pragma once
 
-class Settings
+struct Settings
 {
-public:
-    using bSetting = AutoTOML::bSetting;
-    using fSetting = AutoTOML::fSetting;
+    static void Load();
 
-    static inline bSetting AbsorbChancePatch{ "Patches", "AbsorbChance", true };
-    static inline bSetting PlayerScaleMovementPatch{ "Patches", "PlayerScaleMovement", true };
+    static void ReadSetting(CSimpleIni& a_ini, const char* a_section, const char* a_key, bool& a_setting);
 
-    static bool load_config(const std::string& a_path)
-    {
-        try {
-            const auto table = toml::parse_file(a_path);
-            const auto& settings = ISetting::get_settings();
+    static inline bool NordRaceStats = true;
+    static inline bool ScaleMovementSpeed = true;
 
-            for (const auto& setting : settings) {
-                try {
-                    setting->load(table);
-                } catch (const std::exception& e) {
-                    logs::warn(fmt::runtime(e.what()));
-                }
-            }
-        } catch (const toml::parse_error& e) {
-            std::ostringstream ss;
-            ss
-                << "Error parsing file \'" << *e.source().path
-                << "\':\n"
-                << e.description()
-                << "\n  (" << e.source().begin << ")\n";
-            logs::error(fmt::runtime(ss.str()));
-            return false;
-        }
-        return true;
-    }
-private:
-    using ISetting = AutoTOML::ISetting;
+    static inline bool AbsorptionChance = true;
 
-    Settings();   
+    static constexpr std::string_view INI_PATH = "FTweaks.ini";
 };

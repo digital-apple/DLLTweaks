@@ -1,50 +1,40 @@
--- set minimum xmake version
-set_xmakever("2.7.8")
+set_xmakever("2.8.2")
 
--- set project
-set_project("DLLTweaks")
-set_version("1.0.0")
-set_license("MIT")
+includes("lib/CommonLibVR")
+
+set_project("FTweaks")
+set_version("1.1.0")
+set_license("GPL-3.0")
+
 set_languages("c++23")
-set_optimize("faster")
 set_warnings("allextra", "error")
-
--- set allowed
-set_allowedarchs("windows|x64")
-set_allowedmodes("debug", "releasedbg")
-
--- set defaults
-set_defaultarchs("windows|x64")
 set_defaultmode("releasedbg")
 
--- add rules
 add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
--- set policies
 set_policy("package.requires_lock", true)
 
--- require packages
-add_requires("commonlibsse-ng", { configs = { skyrim_vr = false } }, "toml++")
+add_requires("simpleini")
 
--- targets
-target("DLLTweaks")
-    -- add packages to target
-    add_packages("fmt", "spdlog", "commonlibsse-ng", "toml++")
+set_config("skyrim_vr", false)
 
-    -- add commonlibsse-ng plugin
-    add_rules("@commonlibsse-ng/plugin", {
-        name = "DLLTweaks",
-        author = "digital-apple",
+target("FTweaks")
+    add_deps("commonlibsse-ng")
+	
+	add_packages("simpleini")
+
+    add_rules("commonlibsse-ng.plugin", {
+        name = "FTweaks",
+        author = "FTweaks Team",
+        description = "Fixes and tweaks for FTweaks"
     })
 
-    -- add src files
     add_files("source/**.cpp")
-    add_headerfiles("include/**.h", "include/**.hpp")
-    add_includedirs("include")
+    add_headerfiles("include/**.h")
+    add_includedirs("include", { public = true })
     set_pcxxheader("include/PCH.h")
 
-    -- copy build files to MODS or SKYRIM paths
     after_build(function(target)
         local copy = function(env, ext)
             for _, env in pairs(env:split(";")) do
@@ -56,9 +46,9 @@ target("DLLTweaks")
                 end
             end
         end
-        if os.getenv("SKYRIM_MODS_PATH") then
-            copy(os.getenv("SKYRIM_MODS_PATH"), target:name())
-        elseif os.getenv("SKYRIM_PATH") then
-            copy(os.getenv("SKYRIM_PATH"), "Data")
+        if os.getenv("XSE_TES5_MODS_PATH") then
+            copy(os.getenv("XSE_TES5_MODS_PATH"), target:name())
+        elseif os.getenv("XSE_TES5_GAME_PATH") then
+            copy(os.getenv("XSE_TES5_GAME_PATH"), "Data")
         end
     end)

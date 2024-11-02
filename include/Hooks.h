@@ -1,7 +1,16 @@
 #pragma once
 
-namespace Addresses
+namespace Fixes
 {
-	auto CheckAbsorbPatch(RE::ActorValueOwner* a_actor, RE::ActorValue a_value) -> std::uint32_t;
-	void Hook();
+    struct NordRaceStats
+    {
+        static void Install();
+    };
+
+    void Install();
+}
+
+namespace Tweaks
+{
+    void Install();
 }

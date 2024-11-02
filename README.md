@@ -1,4 +1,4 @@
-# DLLTweaks
+# FTweaks
 
 * [Nexus Page](https://www.nexusmods.com/skyrimspecialedition/mods/44044)
 

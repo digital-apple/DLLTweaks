@@ -19,11 +19,10 @@ namespace stl
 {
     using namespace SKSE::stl;
 
-    template <class T>
-    void write_thunk_call(std::uintptr_t a_source)
+    template <std::integral T, std::size_t N>
+    void safe_write(std::uintptr_t a_dst, const std::array<T, N>& a_data)
     {
-        auto& trampoline = SKSE::GetTrampoline();
-        T::Callback = trampoline.write_call<5>(a_source, T::Call);
+        REL::safe_write(a_dst, a_data.data(), a_data.size() * sizeof(T));
     }
 
     template <class T>
@@ -31,5 +30,19 @@ namespace stl
     {
         auto& trampoline = SKSE::GetTrampoline();
         trampoline.write_call<5>(a_source, T::Call);
+    }
+
+    template <class T>
+    void write_vfunc_call(std::uintptr_t a_source)
+    {
+        auto& trampoline = SKSE::GetTrampoline();
+        T::Callback = *reinterpret_cast<std::uintptr_t*>(trampoline.write_call<6>(a_source, T::Call));
+    }
+
+    template <class T>
+    void write_thunk_call(std::uintptr_t a_source)
+    {
+        auto& trampoline = SKSE::GetTrampoline();
+        T::Callback = trampoline.write_call<5>(a_source, T::Call);
     }
 }

@@ -10,6 +10,7 @@ struct Settings
     static inline bool ScaleMovementSpeed = true;
 
     static inline bool AbsorptionChance = true;
+    static inline bool ConcentrationCasting = true;
 
     static constexpr std::string_view INI_PATH = "FTweaks.ini";
 };

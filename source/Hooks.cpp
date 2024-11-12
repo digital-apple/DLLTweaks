@@ -117,7 +117,7 @@ namespace Tweaks
             ///// MOV    AL, [RSP+0xC8] 
             stl::safe_write(target.address() + 0x0F, std::array<std::uint8_t, 7>{ 0x8A, 0x84, 0x24, 0xC8, 0x00, 0x00, 0x00 });
 
-            ///// MOV    [RSP+0x20], AL
+            ///// MOV    [RSP+0x20], AL == Use Base Cost
             stl::safe_write(target.address() + 0x16, std::array<std::uint8_t, 4>{ 0x88, 0x44, 0x24, 0x20 });
 
             stl::write_call<ConcentrationCasting>(target.address() + 0x1A);

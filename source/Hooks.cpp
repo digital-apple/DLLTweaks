@@ -85,6 +85,32 @@ namespace Tweaks
         }
     };
 
+    struct PlayerUpdate
+    {
+        static void Call(RE::PlayerCharacter* player, float delta) 
+        {
+            if (player->IsSneaking()) {
+                jumpHeightPlayer(player, Settings::SneakJumpHeightMod);
+            }
+            return func(player, delta);
+        }
+        static bool jumpHeightPlayer(RE::PlayerCharacter* player, float height_mod) 
+        {
+            if (!player->IsInMidair()) {
+                player->GetCharController()->jumpHeight *= height_mod;
+                player->GetCharController()->fallStartHeight *= height_mod;
+                player->GetCharController()->fallTime *= height_mod;
+                return true;
+            }
+            return false;
+        }
+        static void InstallPlayerUpdate() {
+            REL::Relocation<std::uintptr_t> player_vtbl{RE::VTABLE_PlayerCharacter[0]};
+            func = player_vtbl.write_vfunc(0xad, Call);
+        }
+        inline static REL::Relocation<decltype(Call)> func;
+    };
+
     void Install()
     {
         if (Settings::AbsorptionChance) {
@@ -99,8 +125,8 @@ namespace Tweaks
             INFO("Tweaks @ Installed <{}>", typeid(AbsorptionChance).name());
         }
 
-        if (Settings::ConcentrationCasting) {
-            REL::Relocation target{ RELOCATION_ID(33364, 0), REL::Relocate(0x1B4, 0x0) };
+        if (Settings::ConcentrationCasting && REL::Module::GetRuntime() == REL::Module::Runtime::SE) {
+            REL::Relocation target{ RELOCATION_ID(33364, 34145), REL::Relocate(0x1B4, 0x1b6) };
 
             ///// MOV    RCX, [RBX+0xB8] == Actor*
             stl::safe_write(target.address() + 0x00, std::array<std::uint8_t, 7>{ 0x48, 0x8B, 0x8B, 0xB8, 0x00, 0x00, 0x00 });
@@ -120,11 +146,16 @@ namespace Tweaks
             ///// MOV    [RSP+0x20], AL == Use Base Cost
             stl::safe_write(target.address() + 0x16, std::array<std::uint8_t, 4>{ 0x88, 0x44, 0x24, 0x20 });
 
-            stl::write_call<ConcentrationCasting>(target.address() + 0x1A);
+            stl::write_call<ConcentrationCasting>(target.address() + REL::Relocate(0x1A, 0x1D));
 
             stl::safe_write(target.address() + 0x1F, std::array<std::uint8_t, 25>{ 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 
             INFO("Tweaks @ Installed <{}>", typeid(ConcentrationCasting).name());
+        }
+
+        if (Settings::SneakJumpHeightEnable) {
+            PlayerUpdate::InstallPlayerUpdate();
+            INFO("Tweak @ Installed <{}>", typeid(PlayerUpdate).name());
         }
     }
 }

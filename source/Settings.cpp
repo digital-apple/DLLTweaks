@@ -8,12 +8,14 @@ void Settings::Load()
 
     ini.SetUnicode();
 
-    ini.LoadFile(INI_PATH.data());
+    ini.LoadFile(R"(.\Data\SKSE\Plugins\FTweaks.ini)");
 
     ReadSetting(ini, "Fixes", "bNordRaceStats", NordRaceStats);
     ReadSetting(ini, "Fixes", "bScaleMovementSpeed", ScaleMovementSpeed);
-
     ReadSetting(ini, "Tweaks", "bAbsorptionChance", AbsorptionChance);
+    ReadSetting(ini, "Tweaks", "bSneakJumpHeightEnable", SneakJumpHeightEnable);
+    //SneakJumpHeightEnable = ini.GetBoolValue("Tweaks", "bSneakJumpHeightEnable");
+    SneakJumpHeightMod = (float)ini.GetDoubleValue("Tweaks", "fSneakJumpModifier", 0.55f);
 
     INFO("FTweaks @ Settings Loaded!");
 }

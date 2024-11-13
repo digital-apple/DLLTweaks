@@ -34,6 +34,7 @@ void InitMessaging()
         switch (a_message->type) {
         case SKSE::MessagingInterface::kInputLoaded:
             {
+                Settings::Load();
                 Fixes::Install();
                 Tweaks::Install();
             }
@@ -60,8 +61,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 
     SKSE::Init(a_skse);
 
-    SKSE::AllocTrampoline(14 * 4);
-    Settings::Load();
+    SKSE::AllocTrampoline(14 * 3);
 
     InitMessaging();
 

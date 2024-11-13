@@ -60,7 +60,8 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 
     SKSE::Init(a_skse);
 
-    SKSE::AllocTrampoline(14 * 3);
+    SKSE::AllocTrampoline(14 * 4);
+    Settings::Load();
 
     InitMessaging();
 

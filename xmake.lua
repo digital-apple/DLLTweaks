@@ -2,8 +2,8 @@ set_xmakever("2.8.2")
 
 includes("lib/CommonLibVR")
 
-set_project("FTweaks")
-set_version("1.1.0")
+set_project("DLLTweaks")
+set_version("1.2.0")
 set_license("GPL-3.0")
 
 set_languages("c++23")
@@ -19,13 +19,13 @@ add_requires("simpleini")
 
 set_config("skyrim_vr", false)
 
-target("FTweaks")
+target("DLLTweaks")
     add_deps("commonlibsse-ng")
 	
     add_packages("simpleini")
 
     add_rules("commonlibsse-ng.plugin", {
-        name = "FTweaks",
+        name = "DLLTweaks",
         author = "FTweaks Team",
         description = "Fixes and tweaks for FTweaks"
     })
@@ -35,6 +35,8 @@ target("FTweaks")
     add_includedirs("include", { public = true })
     set_pcxxheader("include/PCH.h")
 
+    add_extrafiles("release/**.ini")
+
     after_build(function(target)
         local copy = function(env, ext)
             for _, env in pairs(env:split(";")) do
@@ -43,6 +45,7 @@ target("FTweaks")
                     os.mkdir(plugins)
                     os.trycp(target:targetfile(), plugins)
                     os.trycp(target:symbolfile(), plugins)
+                    os.trycp("$(projectdir)/release/*.ini", plugins)
                 end
             end
         end

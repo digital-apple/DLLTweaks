@@ -6,10 +6,10 @@
         ["cmake#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "ea9a6999d5179e9d96d123c24f77696d52a30007",
+                commit = "b2d6e85d23e92d8b8aade0f5cf926075912e7e37",
                 url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "3.31.0"
+            version = "3.30.4"
         },
         ["directxmath#31fecfc4"] = {
             repo = {
@@ -38,7 +38,7 @@
         ["spdlog#9c36f0a9"] = {
             repo = {
                 branch = "master",
-                commit = "ea9a6999d5179e9d96d123c24f77696d52a30007",
+                commit = "b2d6e85d23e92d8b8aade0f5cf926075912e7e37",
                 url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "v1.15.0"

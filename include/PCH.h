@@ -10,10 +10,10 @@
 
 using namespace std::literals;
 
-#define ERROR(message, ...) SKSE::log::error(message, __VA_ARGS__)
-#define INFO(message, ...) SKSE::log::info(message, __VA_ARGS__)
-#define TRACE(message, ...) SKSE::log::trace(message, __VA_ARGS__)
-#define WARN(message, ...) SKSE::log::warn(message, __VA_ARGS__)
+#define ERROR(message, ...) SKSE::log::error(message, ##__VA_ARGS__)
+#define INFO(message, ...) SKSE::log::info(message, ##__VA_ARGS__)
+#define TRACE(message, ...) SKSE::log::trace(message, ##__VA_ARGS__)
+#define WARN(message, ...) SKSE::log::warn(message, ##__VA_ARGS__)
 
 namespace stl
 {

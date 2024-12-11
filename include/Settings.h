@@ -17,5 +17,5 @@ struct Settings
     static inline bool SneakJumpHeight = true;
     static inline float SneakJumpHeightMod = 0.55f;
 
-    inline static std::filesystem::path INI_PATH = L"DLLTweaks.ini";
+    inline static std::filesystem::path INI_PATH = L"Data\\SKSE\\Plugins\\DLLTweaks.ini";
 };

@@ -72,7 +72,7 @@ namespace Tweaks
             if (a_spell->GetCastingType() == RE::MagicSystem::CastingType::kConcentration) {
                 const auto value_maximum = a_actor->AsActorValueOwner()->GetPermanentActorValue(a_value);
 
-                return value_maximum >= a_cost;
+                return value_maximum >= a_cost && result >= a_cost;
             }
 
             return result >= a_cost;

@@ -3,7 +3,7 @@ set_xmakever("2.8.2")
 includes("lib/CommonLibVR")
 
 set_project("DLLTweaks")
-set_version("1.2.1")
+set_version("1.2.2")
 set_license("GPL-3.0")
 
 set_languages("c++23")

@@ -81,35 +81,30 @@ namespace Tweaks
 
     // Decreases jump height while sneaking.
 
-    struct PlayerUpdate
+    struct JumpHeight
     {
-        static void Call(RE::PlayerCharacter* player, float delta) 
+        static float JumpHeightGetScale(RE::TESObjectREFR* refr) 
         {
-            if (player->IsSneaking()) {
-                JumpHeightPlayer(player, Settings::SneakJumpHeightMod);
+            float scale = refr->GetScale();
+            RE::Actor* actor = refr->As<RE::Actor>();
+            if (!actor) {
+                return scale;
             }
-
-            return func(player, delta);
-        }
-
-        static bool JumpHeightPlayer(RE::PlayerCharacter* player, float height_mod) 
-        {
-            if (!player->IsInMidair()) {
-                player->GetCharController()->jumpHeight *= height_mod;
-                player->GetCharController()->fallStartHeight *= height_mod;
-                player->GetCharController()->fallTime *= height_mod;
-
-                return true;
+            if (actor->IsSneaking()) {
+                scale *= Settings::SneakJumpHeightMod;
             }
-
-            return false;
-        }
-        static void InstallPlayerUpdate()
+            return scale;
+        
+        };
+        static void Install() 
         {
-            REL::Relocation<std::uintptr_t> player_vtbl{RE::VTABLE_PlayerCharacter[0]};
-            func = player_vtbl.write_vfunc(0xAD, Call);
-        }
-        inline static REL::Relocation<decltype(Call)> func;
+            auto& trampoline = SKSE::GetTrampoline();
+            REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(36271, 37257), REL::Relocate(0x190, 0x17f, 0x190) };
+            func = trampoline.write_call<5>(target.address(), JumpHeightGetScale); 
+        };
+
+    private:
+        static inline REL::Relocation<decltype(JumpHeightGetScale)> func;
     };
 
     void Install()
@@ -162,9 +157,9 @@ namespace Tweaks
         }
 
         if (Settings::SneakJumpHeight) {
-            PlayerUpdate::InstallPlayerUpdate();
+            JumpHeight::Install();
 
-            INFO("Tweaks @ Installed <{}>", typeid(PlayerUpdate).name());
+            INFO("Tweaks @ Installed <{}>", typeid(JumpHeight).name());
         }
     }
 }

@@ -1,6 +1,6 @@
 set_xmakever("2.8.2")
 
-includes("lib/CommonLibVR")
+includes("libraries/commonlibsse-ng")
 
 set_project("DLLTweaks")
 set_version("1.2.2")
@@ -8,16 +8,13 @@ set_license("GPL-3.0")
 
 set_languages("c++23")
 set_warnings("allextra", "error")
-set_defaultmode("releasedbg")
+
+set_policy("package.requires_lock", true)
 
 add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
-set_policy("package.requires_lock", true)
-
 add_requires("simpleini")
-
-set_config("skyrim_vr", false)
 
 target("DLLTweaks")
     add_deps("commonlibsse-ng")

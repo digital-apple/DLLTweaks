@@ -83,28 +83,63 @@ namespace Tweaks
 
     struct JumpHeight
     {
-        static float JumpHeightGetScale(RE::TESObjectREFR* refr) 
+        static auto Call(RE::TESObjectREFR* a_reference) -> float
         {
-            float scale = refr->GetScale();
-            RE::Actor* actor = refr->As<RE::Actor>();
+            auto scale = a_reference->GetScale();
+
+            const auto actor = a_reference->As<RE::Actor>();
+
             if (!actor) {
                 return scale;
             }
+
             if (actor->IsSneaking()) {
                 scale *= Settings::SneakJumpHeightMod;
             }
-            return scale;
-        
-        };
-        static void Install() 
-        {
-            auto& trampoline = SKSE::GetTrampoline();
-            REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(36271, 37257), REL::Relocate(0x190, 0x17f, 0x190) };
-            func = trampoline.write_call<5>(target.address(), JumpHeightGetScale); 
-        };
 
-    private:
-        static inline REL::Relocation<decltype(JumpHeightGetScale)> func;
+            return scale;
+        };
+        static inline REL::Relocation<decltype(Call)> Callback;
+    };
+
+    struct ModProjectileCastingSoundEvent
+    {
+        static auto Call(RE::Projectile* a_projectile) -> RE::ActorCause*
+        {
+            const auto result = Callback(a_projectile);
+
+            const auto spell = a_projectile->GetProjectileRuntimeData().spell;
+
+            if (!spell) {
+                return result;
+            }
+
+            const auto source_handle = a_projectile->GetProjectileRuntimeData().shooter;
+            const auto source_pointer = source_handle ? source_handle.get() : nullptr;
+            const auto source = source_pointer ? source_pointer.get() : nullptr;
+
+            const auto actor = source && source->IsActor() ? source->As<RE::Actor>() : nullptr;
+
+            if (!actor) {
+                return result;
+            }
+
+            auto sound_level = 1.f;
+
+            RE::BGSEntryPoint::HandleEntryPoint(RE::BGSEntryPoint::ENTRY_POINT::kModSpellCastingSoundEvent, actor, spell, &sound_level);
+
+            return sound_level != 0.f ? result : nullptr;
+        }
+        static inline REL::Relocation<decltype(Call)> Callback;
+    };
+
+    struct ModExplosionCastingSoundEvent
+    {
+        static auto Call(RE::Explosion* a_explosion) -> RE::ActorCause*
+        {
+            return Callback(a_explosion);
+        }
+        static inline REL::Relocation<decltype(Call)> Callback;
     };
 
     void Install()
@@ -157,9 +192,17 @@ namespace Tweaks
         }
 
         if (Settings::SneakJumpHeight) {
-            JumpHeight::Install();
+            REL::Relocation target{ RELOCATION_ID(36271, 37257), REL::Relocate(0x190, 0x17F, 0x190) };
+            stl::write_thunk_call<JumpHeight>(target.address());
 
             INFO("Tweaks @ Installed <{}>", typeid(JumpHeight).name());
+        }
+
+        if (Settings::ModProjectileCastingSoundEvent) {
+            REL::Relocation target{ RELOCATION_ID(43022, 44213), REL::Relocate(0xD4, 0xD3) };
+            stl::write_vfunc_call<ModProjectileCastingSoundEvent, RE::Projectile, 0, 0x51>(target.address());
+
+            INFO("Tweaks @ Installed <{}>", typeid(ModProjectileCastingSoundEvent).name());
         }
     }
 }

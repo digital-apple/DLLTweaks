@@ -17,5 +17,7 @@ struct Settings
     static inline bool SneakJumpHeight = true;
     static inline float SneakJumpHeightMod = 0.55f;
 
+    static inline bool ModProjectileCastingSoundEvent = true;
+
     inline static std::filesystem::path INI_PATH = L"Data\\SKSE\\Plugins\\DLLTweaks.ini";
 };

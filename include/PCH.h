@@ -14,6 +14,7 @@ using namespace std::literals;
 #define INFO(message, ...) SKSE::log::info(message, ##__VA_ARGS__)
 #define TRACE(message, ...) SKSE::log::trace(message, ##__VA_ARGS__)
 #define WARN(message, ...) SKSE::log::warn(message, ##__VA_ARGS__)
+#define CRITICAL(message, ...) SKSE::log::critical(message, ##__VA_ARGS__)
 
 namespace stl
 {
@@ -32,11 +33,15 @@ namespace stl
         trampoline.write_call<5>(a_source, T::Call);
     }
 
-    template <class T>
+    template <class T, class V, std::size_t I, std::size_t O>
     void write_vfunc_call(std::uintptr_t a_source)
     {
         auto& trampoline = SKSE::GetTrampoline();
-        T::Callback = *reinterpret_cast<std::uintptr_t*>(trampoline.write_call<6>(a_source, T::Call));
+        trampoline.write_call<6>(a_source, T::Call);
+
+        REL::Relocation VTABLE { V::VTABLE[I] };
+
+        T::Callback = *reinterpret_cast<std::uintptr_t*>(VTABLE.address() + O * 8);
     }
 
     template <class T>

@@ -16,6 +16,7 @@ void Settings::Load()
     ReadSetting(ini, "Tweaks", "bConcentrationCasting", ConcentrationCasting);
     ReadSetting(ini, "Tweaks", "bSneakJumpHeight", SneakJumpHeight);
     ReadSetting(ini, "Tweaks", "fSneakJumpModifier", SneakJumpHeightMod);
+    ReadSetting(ini, "Tweaks", "bModProjectileCastingSoundEvent", ModProjectileCastingSoundEvent);
 
     INFO("DLLTweaks @ Settings Loaded!");
 }
